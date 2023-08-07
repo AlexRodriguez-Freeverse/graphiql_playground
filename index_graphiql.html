@@ -55,34 +55,27 @@
       type="application/javascript"
     ></script>
     <script>
-      
-      function onTabChange(tabsState) {
-        // Remove all the previous queries. It stores all the history,
-        // and this is the only way it deletes the previous stuff
-        tabsState.tabs.length = 1;
-      }
-    
-      // Parse the search string to get url parameters.
-      const parameters = {};
-      for (const entry of window.location.search.slice(1).split('&')) {
-        const eq = entry.indexOf('=');
-        if (eq >= 0) {
-          parameters[decodeURIComponent(entry.slice(0, eq))] = decodeURIComponent(
-            entry.slice(eq + 1),
-          );
-        }
-      }
+        const parameters = [];
 
-      ReactDOM.render(
-        React.createElement(GraphiQL, {
-          fetcher: GraphiQL.createFetcher({
-            url: 'https://api.staging.blackhole.gorengine.com/',
-          }),
-          query: parameters.query,
-          onTabChange,
-        }),
-        document.getElementById('graphiql'),
-      );
+        // Parse the search string to get the queries to initialize the tabs
+        for (const entry of window.location.search.slice(1).split('&')) {
+            const eq = entry.indexOf('=');
+            if (eq >= 0)
+                parameters.push({ query: decodeURIComponent(entry.slice(eq + 1))});
+        }
+
+        //console.log(parameters);
+
+        ReactDOM.render(
+            React.createElement(GraphiQL, {
+                fetcher: GraphiQL.createFetcher({
+                url: 'https://api.staging.blackhole.gorengine.com/',    // defaulting to staging environment
+              }),
+              defaultTabs: parameters,  // Set the default queries
+              storage: null,            // Delete the storage in order to have a clean rendering
+            }),
+            document.getElementById('graphiql'),
+        );
     </script>
   </body>
 </html>
